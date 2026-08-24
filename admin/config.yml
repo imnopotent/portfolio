@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: USERNAME/REPO          # <-- change to your GitHub username/repo
+  repo: ilyassbenfssahi/portfolio
   branch: main
 
 media_folder: "assets/work"
