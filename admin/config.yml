@@ -1,0 +1,108 @@
+backend:
+  name: github
+  repo: USERNAME/REPO          # <-- change to your GitHub username/repo
+  branch: main
+
+media_folder: "assets/work"
+public_folder: "/assets/work"
+
+site_url: https://ilyass.online
+display_url: https://ilyass.online
+
+collections:
+  - name: site
+    label: Site
+    files:
+      - name: content
+        label: Everything
+        file: content.json
+        format: json
+        fields:
+
+          - { name: name, label: Your name, widget: string }
+          - { name: role, label: Role, widget: string }
+          - { name: email, label: Email, widget: string }
+
+          - name: wallpaper
+            label: Wallpaper (your photo)
+            widget: image
+            required: false
+            hint: Portrait, shot straight on. It fills the whole screen.
+
+          - name: cv
+            label: About text
+            widget: text
+            hint: Shown when someone opens the CV icon in the dock.
+
+          - name: dock
+            label: Dock
+            widget: list
+            collapsed: true
+            label_singular: Dock item
+            summary: "{{fields.label}}"
+            fields:
+              - { name: label, label: Name, widget: string }
+              - { name: text, label: Letters shown, widget: string, required: false, hint: "e.g. Ai, Ps, IG" }
+              - { name: color, label: Colour, widget: color, required: false }
+              - name: icon
+                label: Custom icon image
+                widget: image
+                required: false
+                hint: Optional. Replaces the coloured tile.
+              - name: action
+                label: What it does
+                widget: select
+                options: [none, cv, mail, link, trash]
+              - { name: url, label: Link, widget: string, required: false }
+
+          - name: projects
+            label: Projects
+            label_singular: Project
+            widget: list
+            collapsed: true
+            summary: "{{fields.title}} — {{fields.client}}"
+            hint: Drag to reorder. Order controls where icons land on the desktop.
+            fields:
+
+              - { name: title, label: Title, widget: string, hint: "Shown under the icon. Keep it short." }
+              - { name: slug, label: ID, widget: string, hint: "Lowercase, no spaces. Must be unique." }
+              - { name: client, label: Client, widget: string, required: false }
+              - { name: year, label: Year, widget: string, required: false }
+
+              - name: field
+                label: Kind of work
+                widget: select
+                required: false
+                options: [Identity, Poster, Campaign, Packaging, Object, Product, Experiment]
+
+              - name: thumb
+                label: Icon image
+                widget: image
+                required: false
+                hint: The small square on the desktop.
+
+              - name: images
+                label: Images
+                widget: list
+                required: false
+                field: { name: image, label: Image, widget: image }
+                hint: Shown when the project is opened.
+
+              - name: text
+                label: Description
+                widget: text
+                required: false
+
+              - name: x
+                label: Icon position — across (%)
+                widget: number
+                required: false
+                value_type: float
+                hint: Leave empty to place it automatically.
+
+              - name: y
+                label: Icon position — down (%)
+                widget: number
+                required: false
+                value_type: float
+                hint: Leave empty to place it automatically.
