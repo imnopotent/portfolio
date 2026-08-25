@@ -33,7 +33,7 @@ function start(){
   tick(); setInterval(tick, 20000);
 
   buildDock();
-  if(touch) buildMobile(); else buildIcons();
+  if(touch){ buildMobile(); } else { buildIcons(); buildNotes(); }
 }
 
 function tick(){
@@ -93,7 +93,10 @@ function relax(pts, W, H, minX, minY){
 function buildIcons(){
   const desk = $('#desktop');
   const n = DATA.projects.length;
-  const W = desk.clientWidth, H = desk.clientHeight;
+  const H = desk.clientHeight;
+  /* keep clear of the notes column on the right */
+  const reserved = (DATA.notes || []).length && desk.clientWidth > 1000 ? 272 : 0;
+  const W = desk.clientWidth - reserved;
 
   /* seed positions, then relax so nothing collides */
   const pts = DATA.projects.map((p, i) => {
@@ -154,6 +157,7 @@ function dragify(node, bounds, handle){
 
   grip.addEventListener('pointerdown', e => {
     if(e.button !== 0) return;
+    if(e.target.closest('[data-nodrag]')) return;   /* buttons stay clickable */
     const r = node.getBoundingClientRect();
     const b = bounds.getBoundingClientRect();
     sx = e.clientX; sy = e.clientY;
@@ -203,37 +207,139 @@ function openWindow(key, title, bodyHTML){
 
   w.innerHTML =
     `<div class="win__bar">
-       <span class="dot dot--r" data-close role="button" aria-label="Close"></span>
+       <button class="dot dot--r" data-close data-nodrag aria-label="Close"></button>
        <span class="dot dot--y"></span>
        <span class="dot dot--g"></span>
        <span class="win__title">${esc(title)}</span>
      </div>
-     <div class="win__body">${bodyHTML}</div>`;
+     <div class="win__body">${bodyHTML}</div>
+     ${['nw','n','ne','e','se','s','sw','w']
+        .map(d => `<span class="rz rz--${d}" data-rz="${d}"></span>`).join('')}`;
 
   w.addEventListener('pointerdown', () => { w.style.zIndex = ++z; });
-  w.querySelector('[data-close]').addEventListener('click', () => {
-    w.remove(); openWins.delete(key);
+  w.querySelector('[data-close]').addEventListener('click', e => {
+    e.stopPropagation();
+    w.remove();
+    openWins.delete(key);
   });
 
   $('#windows').appendChild(w);
+
+  /* lock in the natural size, then let it be resized freely */
+  const r = w.getBoundingClientRect();
+  const body = w.querySelector('.win__body');
+  const natural = body.scrollHeight + 36;          /* + title bar */
+  w.style.width  = r.width + 'px';
+  w.style.height = clamp(natural, 170, innerHeight * 0.78) + 'px';
+  w.style.maxHeight = 'none';
+
   dragify(w, $('#windows'), w.querySelector('.win__bar'));
+  resizify(w);
   openWins.set(key, w);
   return w;
+}
+
+/* ---------------------------------------------------------
+   Resizing — drag any edge or corner
+   --------------------------------------------------------- */
+
+function resizify(w){
+  const MIN_W = 300, MIN_H = 180;
+
+  w.querySelectorAll('[data-rz]').forEach(h => {
+    h.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const dir = h.dataset.rz;
+      const r = w.getBoundingClientRect();
+      const b = $('#windows').getBoundingClientRect();
+      const sx = e.clientX, sy = e.clientY;
+      const x0 = r.left - b.left, y0 = r.top - b.top;
+      const w0 = r.width, h0 = r.height;
+      h.setPointerCapture(e.pointerId);
+      w.style.zIndex = ++z;
+
+      const move = ev => {
+        const dx = ev.clientX - sx, dy = ev.clientY - sy;
+
+        if(dir.includes('e')) w.style.width = Math.max(MIN_W, w0 + dx) + 'px';
+        if(dir.includes('s')) w.style.height = Math.max(MIN_H, h0 + dy) + 'px';
+
+        if(dir.includes('w')){
+          const nw = Math.max(MIN_W, w0 - dx);
+          w.style.width = nw + 'px';
+          w.style.left  = (x0 + (w0 - nw)) + 'px';
+        }
+        if(dir.includes('n')){
+          const nh = Math.max(MIN_H, h0 - dy);
+          w.style.height = nh + 'px';
+          w.style.top    = (y0 + (h0 - nh)) + 'px';
+        }
+      };
+      const up = ev => {
+        h.releasePointerCapture(ev.pointerId);
+        h.removeEventListener('pointermove', move);
+        h.removeEventListener('pointerup', up);
+      };
+      h.addEventListener('pointermove', move);
+      h.addEventListener('pointerup', up);
+    });
+  });
 }
 
 function openProject(p){
   const meta = [p.client, p.year, p.field].filter(Boolean)
     .map(m => `<span>${esc(m)}</span>`).join('');
 
-  const media = (p.images || []).map(src =>
-    `<img src="${src}" alt="${esc(p.title)}"
-          onerror="this.outerHTML='<div class=&quot;ph&quot;>${esc(src.split('/').pop())}</div>'">`
-  ).join('');
+  /* render sized placeholders first so the window knows its height
+     immediately, then swap in each image as it arrives */
+  const media = (p.images || []).map((src, i) =>
+    `<div class="ph" data-slot="${i}">${esc(src.split('/').pop())}</div>`).join('');
 
-  openWindow('p:' + p.slug, p.title,
+  const w = openWindow('p:' + p.slug, p.title,
     `<div class="win__meta">${meta}</div>
      ${p.text ? `<p class="win__text">${esc(p.text)}</p>` : ''}
      <div class="win__media">${media}</div>`);
+
+  (p.images || []).forEach((src, i) => {
+    const img = new Image();
+    img.src = src;
+    img.alt = `${p.client} — ${p.title}`;
+    img.onload = () => {
+      const slot = w.querySelector(`[data-slot="${i}"]`);
+      if(slot) slot.replaceWith(img);
+    };
+  });
+}
+
+/* ---------------------------------------------------------
+   Sticky notes
+   --------------------------------------------------------- */
+
+function buildNotes(){
+  const desk = $('#desktop');
+  const notes = DATA.notes || [];
+  const W = desk.clientWidth, H = desk.clientHeight;
+
+  notes.forEach((nt, i) => {
+    const n = el('div', 'note');
+    n.style.background = nt.color || '#FCF07A';
+    n.style.setProperty('--tilt', ((i % 2 ? 1 : -1) * (0.7 + (i % 3) * 0.5)) + 'deg');
+
+    /* default: down the right-hand side, clear of the icon field */
+    const x = nt.x != null ? +nt.x / 100 * W : W - (W > 1000 ? 244 : 232);
+    const y = nt.y != null ? +nt.y / 100 * H : 34 + i * 174;
+
+    n.style.left = clamp(x, 8, Math.max(8, W - 220)) + 'px';
+    n.style.top  = clamp(y, 4, Math.max(4, H - 150)) + 'px';
+
+    n.innerHTML =
+      `<b class="note__title">${esc(nt.title || '')}</b>
+       <div class="note__text">${esc(nt.text || '')}</div>`;
+
+    dragify(n, desk);
+    desk.appendChild(n);
+  });
 }
 
 /* ---------------------------------------------------------
@@ -273,6 +379,14 @@ function buildDock(){
 function buildMobile(){
   const m = $('#mlist');
   m.appendChild(el('p', 'mlist__intro', esc(DATA.cv || '')));
+
+  (DATA.notes || []).forEach(nt => {
+    const n = el('div', 'note note--flat',
+      `<b class="note__title">${esc(nt.title||'')}</b>
+       <div class="note__text">${esc(nt.text||'')}</div>`);
+    n.style.background = nt.color || '#FCF07A';
+    m.appendChild(n);
+  });
 
   DATA.projects.forEach(p => {
     const row = el('button', 'mrow',

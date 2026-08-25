@@ -471,5 +471,35 @@
       "x": null,
       "y": null
     }
+  ],
+  "notes": [
+    {
+      "title": "What I do",
+      "text": "Campaigns, key visuals, identities, posters and packaging — mostly for banks, airlines and cultural institutions.",
+      "color": "#FCF07A",
+      "x": null,
+      "y": null
+    },
+    {
+      "title": "What I like doing",
+      "text": "Marks, emblems, seals, badges. Anything small that has to carry a lot.",
+      "color": "#BFE8FF",
+      "x": null,
+      "y": null
+    },
+    {
+      "title": "What I'm learning",
+      "text": "3D. Not to become a 3D artist — to make objects I can already see and can't yet build.",
+      "color": "#FFD3E2",
+      "x": null,
+      "y": null
+    },
+    {
+      "title": "What I want next",
+      "text": "Medals, trophies, objects. Work that ends up in someone's hand instead of on a wall.",
+      "color": "#D6F5C8",
+      "x": null,
+      "y": null
+    }
   ]
 }
