@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: ilyassbenfssahi/portfolio
+  repo: USERNAME/REPO          # <-- change to your GitHub username/repo
   branch: main
 
 media_folder: "assets/work"
@@ -54,6 +54,21 @@ collections:
                 widget: select
                 options: [none, cv, mail, link, trash]
               - { name: url, label: Link, widget: string, required: false }
+
+          - name: notes
+            label: Sticky notes
+            label_singular: Note
+            widget: list
+            collapsed: true
+            summary: "{{fields.title}}"
+            required: false
+            hint: Little notes pinned to the desktop. Drag to reorder.
+            fields:
+              - { name: title, label: Heading, widget: string }
+              - { name: text, label: Text, widget: text }
+              - { name: color, label: Paper colour, widget: color, required: false }
+              - { name: x, label: Position across (%), widget: number, required: false, value_type: float }
+              - { name: y, label: Position down (%), widget: number, required: false, value_type: float }
 
           - name: projects
             label: Projects
