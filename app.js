@@ -1,15 +1,21 @@
 /* =========================================================
    Desktop portfolio — behaviour
-   All content comes from content.json (edited in /admin)
+   Content comes from content.json (edited at /admin)
    ========================================================= */
 
 let DATA = null;
 let z = 100;
 const openWins = new Map();
 
-const $ = s => document.querySelector(s);
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
 const el = (t, c, h) => { const n = document.createElement(t); if(c) n.className = c; if(h != null) n.innerHTML = h; return n; };
-const touch = matchMedia('(pointer:coarse)').matches || innerWidth < 820;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const br  = s => esc(s).replace(/\n/g, '<br>');
+
+const MOBILE_AT = 860;
+const isMobile = () => innerWidth < MOBILE_AT || matchMedia('(pointer:coarse)').matches;
 
 /* ---------------------------------------------------------
    Boot
@@ -20,71 +26,100 @@ fetch('content.json')
   .then(d => { DATA = d; start(); })
   .catch(() => {
     document.body.innerHTML =
-      '<p style="font:14px system-ui;color:#333;padding:40px">' +
-      'content.json could not be loaded. Run this through a web server, not by ' +
-      'double-clicking the file.</p>';
+      '<p style="font:14px system-ui;color:#333;padding:40px">content.json could not be loaded.</p>';
   });
 
 function start(){
-  $('#mbName').textContent = DATA.name;
-  document.title = DATA.name;
+  $('#mbName').textContent = DATA.name || '';
+  document.title = DATA.name || 'Portfolio';
   if(DATA.wallpaper) $('#wall').style.backgroundImage = `url("${DATA.wallpaper}")`;
 
   tick(); setInterval(tick, 20000);
 
   buildDock();
-  if(touch){ buildMobile(); } else { buildIcons(); buildNotes(); }
+  layout();
+
+  let t;
+  addEventListener('resize', () => { clearTimeout(t); t = setTimeout(layout, 140); }, {passive:true});
 }
 
 function tick(){
   $('#mbClock').textContent = new Intl.DateTimeFormat('en-GB', {
     weekday:'short', hour:'2-digit', minute:'2-digit', hour12:false,
-    timeZone:'Africa/Casablanca'
+    timeZone: DATA.timezone || 'Africa/Casablanca'
   }).format(new Date());
 }
 
 /* ---------------------------------------------------------
-   Icon scatter
-   Deterministic, so the layout is identical on every visit,
-   but looks hand-strewn rather than gridded.
+   Layout — recomputed on every resize
+   --------------------------------------------------------- */
+
+let mode = null;
+
+function layout(){
+  const want = isMobile() ? 'mobile' : 'desktop';
+
+  if(want !== mode){
+    mode = want;
+    document.body.dataset.mode = mode;
+    $('#desktop').innerHTML = '';
+    $('#mlist').innerHTML = '';
+    if(mode === 'mobile'){ closeAll(); buildMobile(); return; }
+    buildIcons(); buildNotes();
+    return;
+  }
+
+  if(mode === 'desktop'){
+    $('#desktop').innerHTML = '';
+    buildIcons(); buildNotes();
+    reflowWindows();
+  }
+}
+
+function reflowWindows(){
+  const b = $('#windows').getBoundingClientRect();
+  openWins.forEach(w => {
+    const r = w.getBoundingClientRect();
+    const width  = Math.min(r.width,  b.width  - 24);
+    const height = Math.min(r.height, b.height - 24);
+    w.style.width  = width + 'px';
+    w.style.height = height + 'px';
+    w.style.left = clamp(r.left - b.left, 8, Math.max(8, b.width  - width  - 8)) + 'px';
+    w.style.top  = clamp(r.top  - b.top,  8, Math.max(8, b.height - height - 8)) + 'px';
+  });
+}
+
+/* ---------------------------------------------------------
+   Icons
    --------------------------------------------------------- */
 
 function scatter(n, i){
-  /* golden-angle spiral, squashed to the viewport, with jitter */
-  const g = 2.399963;
-  const a = i * g;
+  const a = i * 2.399963;
   const r = Math.sqrt((i + 0.6) / n);
   const jx = Math.sin(i * 12.9898) * 0.5;
   const jy = Math.sin(i * 78.233) * 0.5;
-  return {
-    x: 50 + Math.cos(a) * r * 44 + jx * 4.0,
-    y: 48 + Math.sin(a) * r * 40 + jy * 3.6
-  };
+  return { x: 50 + Math.cos(a) * r * 44 + jx * 4, y: 48 + Math.sin(a) * r * 40 + jy * 3.6 };
 }
 
-/* push overlapping icons apart — deterministic, runs once at layout */
 function relax(pts, W, H, minX, minY){
-  for(let pass = 0; pass < 90; pass++){
+  for(let pass = 0; pass < 80; pass++){
     for(let i = 0; i < pts.length; i++){
       for(let j = i + 1; j < pts.length; j++){
         const a = pts[i], b = pts[j];
         const dx = b.px - a.px, dy = b.py - a.py;
         const ox = minX - Math.abs(dx), oy = minY - Math.abs(dy);
         if(ox > 0 && oy > 0){
-          /* separate along whichever axis needs least movement */
           if(ox / minX < oy / minY){
-            const s = (dx >= 0 ? 1 : -1) * ox / 2;
-            a.px -= s; b.px += s;
+            const s = (dx >= 0 ? 1 : -1) * ox / 2; a.px -= s; b.px += s;
           } else {
-            const s = (dy >= 0 ? 1 : -1) * oy / 2;
-            a.py -= s; b.py += s;
+            const s = (dy >= 0 ? 1 : -1) * oy / 2; a.py -= s; b.py += s;
           }
         }
       }
     }
     pts.forEach(p => {
-      p.px = clamp(p.px, 8, W - minX * 0.85);
-      p.py = clamp(p.py, 6, H - minY * 0.9);
+      p.px = clamp(p.px, minX * 0.55, W - minX * 0.55);
+      p.py = clamp(p.py, minY * 0.5,  H - minY * 0.55);
     });
   }
   return pts;
@@ -92,43 +127,41 @@ function relax(pts, W, H, minX, minY){
 
 function buildIcons(){
   const desk = $('#desktop');
-  const n = DATA.projects.length;
+  const projects = DATA.projects || [];
+  const n = projects.length;
+  if(!n) return;
+
   const H = desk.clientHeight;
-  /* keep clear of the notes column on the right */
-  const reserved = (DATA.notes || []).length && desk.clientWidth > 1000 ? 272 : 0;
+  const wide = desk.clientWidth > 1080;
+  const reserved = (DATA.notes || []).length && wide ? 268 : 0;
   const W = desk.clientWidth - reserved;
 
-  /* seed positions, then relax so nothing collides */
-  const pts = DATA.projects.map((p, i) => {
+  const scale = clamp(desk.clientWidth / 1440, 0.76, 1);
+  desk.style.setProperty('--icon-scale', scale);
+  const cellX = 122 * scale, cellY = 106 * scale;
+
+  const pts = projects.map((p, i) => {
     const s = (p.x != null && p.y != null) ? {x:+p.x, y:+p.y} : scatter(n, i);
-    return { px: s.x / 100 * W, py: s.y / 100 * H, fixed: p.x != null };
+    return { px: s.x / 100 * W, py: s.y / 100 * H };
   });
-  relax(pts, W, H, 122, 104);
+  relax(pts, W, H, cellX, cellY);
 
-  DATA.projects.forEach((p, i) => {
-    const pos = pts[i];
-
+  projects.forEach((p, i) => {
     const node = el('button', 'icon');
-    node.style.left = (pos.px - 56) + 'px';
-    node.style.top  = (pos.py - 44) + 'px';
-    node.setAttribute('aria-label', `${p.title} — ${p.client}`);
-
-    node.innerHTML =
-      `<div class="icon__ph"></div>
-       <span class="icon__label">${esc(p.title)}</span>`;
+    node.style.left = (pts[i].px - 53 * scale) + 'px';
+    node.style.top  = (pts[i].py - 42 * scale) + 'px';
+    node.setAttribute('aria-label', `${p.title} — ${p.client || ''}`);
+    node.innerHTML = `<div class="icon__ph"></div><span class="icon__label">${esc(p.title)}</span>`;
 
     if(p.thumb){
       const img = new Image();
-      img.src = p.thumb;
-      img.className = 'icon__thumb';
-      img.alt = '';
+      img.src = p.thumb; img.className = 'icon__thumb'; img.alt = '';
       img.onload = () => node.replaceChild(img, node.firstChild);
     }
 
-    /* select on single click, open on double */
     node.addEventListener('click', e => {
       e.stopPropagation();
-      document.querySelectorAll('.icon.is-sel').forEach(x => x.classList.remove('is-sel'));
+      $$('.icon.is-sel').forEach(x => x.classList.remove('is-sel'));
       node.classList.add('is-sel');
     });
     node.addEventListener('dblclick', e => { e.stopPropagation(); openProject(p); });
@@ -139,16 +172,56 @@ function buildIcons(){
     dragify(node, desk);
     desk.appendChild(node);
   });
-
-  document.addEventListener('click', () =>
-    document.querySelectorAll('.icon.is-sel').forEach(x => x.classList.remove('is-sel')));
 }
 
-function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
-function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+document.addEventListener('click', e => {
+  if(!e.target.closest('.icon')) $$('.icon.is-sel').forEach(x => x.classList.remove('is-sel'));
+});
 
 /* ---------------------------------------------------------
-   Dragging (icons and windows)
+   Sticky notes — stacked by measured height, never overlapping
+   --------------------------------------------------------- */
+
+function buildNotes(){
+  const desk = $('#desktop');
+  const notes = DATA.notes || [];
+  if(!notes.length) return;
+
+  const W = desk.clientWidth, H = desk.clientHeight;
+  const wide = W > 1080;
+  const made = [];
+
+  notes.forEach((nt, i) => {
+    const n = el('div', 'note');
+    n.style.background = nt.color || '#FCF07A';
+    n.style.setProperty('--tilt', ((i % 2 ? 1 : -1) * (0.6 + (i % 3) * 0.4)) + 'deg');
+    n.innerHTML = `<b class="note__title">${esc(nt.title)}</b><div class="note__text">${br(nt.text)}</div>`;
+    desk.appendChild(n);
+    made.push({node:n, nt});
+  });
+
+  let cursor = 26;
+  made.forEach(({node, nt}) => {
+    const h = node.offsetHeight;
+
+    if(nt.x != null && nt.y != null){
+      node.style.left = clamp(+nt.x / 100 * W, 8, W - node.offsetWidth - 8) + 'px';
+      node.style.top  = clamp(+nt.y / 100 * H, 6, Math.max(6, H - h - 6)) + 'px';
+      dragify(node, desk);
+      return;
+    }
+
+    if(!wide || cursor + h > H - 18){ node.remove(); return; }
+
+    node.style.left = (W - node.offsetWidth - 26) + 'px';
+    node.style.top  = cursor + 'px';
+    cursor += h + 16;
+    dragify(node, desk);
+  });
+}
+
+/* ---------------------------------------------------------
+   Dragging
    --------------------------------------------------------- */
 
 function dragify(node, bounds, handle){
@@ -157,7 +230,7 @@ function dragify(node, bounds, handle){
 
   grip.addEventListener('pointerdown', e => {
     if(e.button !== 0) return;
-    if(e.target.closest('[data-nodrag]')) return;   /* buttons stay clickable */
+    if(e.target.closest('[data-nodrag]')) return;
     const r = node.getBoundingClientRect();
     const b = bounds.getBoundingClientRect();
     sx = e.clientX; sy = e.clientY;
@@ -169,8 +242,8 @@ function dragify(node, bounds, handle){
     const move = ev => {
       const dx = ev.clientX - sx, dy = ev.clientY - sy;
       if(Math.abs(dx) + Math.abs(dy) > 3) moved = true;
-      node.style.left = clamp(ox + dx, -20, b.width - 60) + 'px';
-      node.style.top  = clamp(oy + dy, 0, b.height - 40) + 'px';
+      node.style.left = clamp(ox + dx, -20, b.width  - 60) + 'px';
+      node.style.top  = clamp(oy + dy, 0,   b.height - 40) + 'px';
     };
     const up = ev => {
       grip.releasePointerCapture(ev.pointerId);
@@ -182,7 +255,6 @@ function dragify(node, bounds, handle){
     grip.addEventListener('pointerup', up);
   });
 
-  /* suppress the click that follows a drag */
   node.addEventListener('click', e => {
     if(node.dataset.moved){ e.stopImmediatePropagation(); delete node.dataset.moved; }
   }, true);
@@ -192,18 +264,16 @@ function dragify(node, bounds, handle){
    Windows
    --------------------------------------------------------- */
 
-function openWindow(key, title, bodyHTML){
+function openWindow(key, title, bodyHTML, opts = {}){
   if(openWins.has(key)){
     const w = openWins.get(key);
     w.style.zIndex = ++z;
     return w;
   }
 
-  const w = el('div', 'win');
+  const w = el('div', 'win' + (opts.wide ? ' win--wide' : ''));
+  const b = $('#windows').getBoundingClientRect();
   const count = openWins.size;
-  w.style.left = `calc(50% - min(380px, 44vw) + ${count * 26}px)`;
-  w.style.top  = `${74 + count * 26}px`;
-  w.style.zIndex = ++z;
 
   w.innerHTML =
     `<div class="win__bar">
@@ -213,25 +283,24 @@ function openWindow(key, title, bodyHTML){
        <span class="win__title">${esc(title)}</span>
      </div>
      <div class="win__body">${bodyHTML}</div>
-     ${['nw','n','ne','e','se','s','sw','w']
-        .map(d => `<span class="rz rz--${d}" data-rz="${d}"></span>`).join('')}`;
+     ${['nw','n','ne','e','se','s','sw','w'].map(d => `<span class="rz rz--${d}" data-rz="${d}"></span>`).join('')}`;
+
+  w.style.zIndex = ++z;
+  $('#windows').appendChild(w);
+
+  const r = w.getBoundingClientRect();
+  const width  = Math.min(r.width, b.width - 24);
+  const height = clamp(w.querySelector('.win__body').scrollHeight + 38, 190, b.height * 0.82);
+  w.style.width = width + 'px';
+  w.style.height = height + 'px';
+  w.style.maxHeight = 'none';
+  w.style.left = clamp((b.width - width) / 2 + count * 24, 8, Math.max(8, b.width - width - 8)) + 'px';
+  w.style.top  = clamp(48 + count * 24, 8, Math.max(8, b.height - height - 8)) + 'px';
 
   w.addEventListener('pointerdown', () => { w.style.zIndex = ++z; });
   w.querySelector('[data-close]').addEventListener('click', e => {
-    e.stopPropagation();
-    w.remove();
-    openWins.delete(key);
+    e.stopPropagation(); w.remove(); openWins.delete(key);
   });
-
-  $('#windows').appendChild(w);
-
-  /* lock in the natural size, then let it be resized freely */
-  const r = w.getBoundingClientRect();
-  const body = w.querySelector('.win__body');
-  const natural = body.scrollHeight + 36;          /* + title bar */
-  w.style.width  = r.width + 'px';
-  w.style.height = clamp(natural, 170, innerHeight * 0.78) + 'px';
-  w.style.maxHeight = 'none';
 
   dragify(w, $('#windows'), w.querySelector('.win__bar'));
   resizify(w);
@@ -239,17 +308,13 @@ function openWindow(key, title, bodyHTML){
   return w;
 }
 
-/* ---------------------------------------------------------
-   Resizing — drag any edge or corner
-   --------------------------------------------------------- */
+function closeAll(){ openWins.forEach(w => w.remove()); openWins.clear(); }
 
 function resizify(w){
   const MIN_W = 300, MIN_H = 180;
-
   w.querySelectorAll('[data-rz]').forEach(h => {
     h.addEventListener('pointerdown', e => {
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       const dir = h.dataset.rz;
       const r = w.getBoundingClientRect();
       const b = $('#windows').getBoundingClientRect();
@@ -261,20 +326,10 @@ function resizify(w){
 
       const move = ev => {
         const dx = ev.clientX - sx, dy = ev.clientY - sy;
-
-        if(dir.includes('e')) w.style.width = Math.max(MIN_W, w0 + dx) + 'px';
+        if(dir.includes('e')) w.style.width  = Math.max(MIN_W, w0 + dx) + 'px';
         if(dir.includes('s')) w.style.height = Math.max(MIN_H, h0 + dy) + 'px';
-
-        if(dir.includes('w')){
-          const nw = Math.max(MIN_W, w0 - dx);
-          w.style.width = nw + 'px';
-          w.style.left  = (x0 + (w0 - nw)) + 'px';
-        }
-        if(dir.includes('n')){
-          const nh = Math.max(MIN_H, h0 - dy);
-          w.style.height = nh + 'px';
-          w.style.top    = (y0 + (h0 - nh)) + 'px';
-        }
+        if(dir.includes('w')){ const nw = Math.max(MIN_W, w0 - dx); w.style.width = nw + 'px'; w.style.left = (x0 + (w0 - nw)) + 'px'; }
+        if(dir.includes('n')){ const nh = Math.max(MIN_H, h0 - dy); w.style.height = nh + 'px'; w.style.top = (y0 + (h0 - nh)) + 'px'; }
       };
       const up = ev => {
         h.releasePointerCapture(ev.pointerId);
@@ -287,58 +342,112 @@ function resizify(w){
   });
 }
 
-function openProject(p){
-  const meta = [p.client, p.year, p.field].filter(Boolean)
-    .map(m => `<span>${esc(m)}</span>`).join('');
+/* ---------------------------------------------------------
+   Media — images, gifs and video handled alike
+   --------------------------------------------------------- */
 
-  /* render sized placeholders first so the window knows its height
-     immediately, then swap in each image as it arrives */
-  const media = (p.images || []).map((src, i) =>
-    `<div class="ph" data-slot="${i}">${esc(src.split('/').pop())}</div>`).join('');
+function mediaHTML(src, i){
+  if(/\.(mp4|webm|mov)$/i.test(src)){
+    return `<video src="${src}" autoplay muted loop playsinline preload="metadata"></video>`;
+  }
+  return `<div class="ph" data-slot="${i}">${esc(src.split('/').pop())}</div>`;
+}
 
-  const w = openWindow('p:' + p.slug, p.title,
-    `<div class="win__meta">${meta}</div>
-     ${p.text ? `<p class="win__text">${esc(p.text)}</p>` : ''}
-     <div class="win__media">${media}</div>`);
-
-  (p.images || []).forEach((src, i) => {
+function swapMedia(scope, images, alt){
+  (images || []).forEach((src, i) => {
+    if(/\.(mp4|webm|mov)$/i.test(src)) return;
     const img = new Image();
-    img.src = src;
-    img.alt = `${p.client} — ${p.title}`;
+    img.src = src; img.alt = alt;
     img.onload = () => {
-      const slot = w.querySelector(`[data-slot="${i}"]`);
+      const slot = scope.querySelector(`[data-slot="${i}"]`);
       if(slot) slot.replaceWith(img);
     };
   });
 }
 
 /* ---------------------------------------------------------
-   Sticky notes
+   Project window
    --------------------------------------------------------- */
 
-function buildNotes(){
-  const desk = $('#desktop');
-  const notes = DATA.notes || [];
-  const W = desk.clientWidth, H = desk.clientHeight;
+function openProject(p){
+  const credits = (p.credits || [])
+    .map(c => `<div class="credit"><dt>${esc(c.role)}</dt><dd>${br(c.names)}</dd></div>`).join('');
 
-  notes.forEach((nt, i) => {
-    const n = el('div', 'note');
-    n.style.background = nt.color || '#FCF07A';
-    n.style.setProperty('--tilt', ((i % 2 ? 1 : -1) * (0.7 + (i % 3) * 0.5)) + 'deg');
+  const details = p.type || [p.field, p.year].filter(Boolean).join(' › ');
 
-    /* default: down the right-hand side, clear of the icon field */
-    const x = nt.x != null ? +nt.x / 100 * W : W - (W > 1000 ? 244 : 232);
-    const y = nt.y != null ? +nt.y / 100 * H : 34 + i * 174;
+  const body = `
+    <header class="proj__head">
+      <div class="proj__chip">${p.thumb ? `<img src="${p.thumb}" alt="">` : ''}</div>
+      <div class="proj__id">
+        <b>${esc(p.title)}</b>
+        <span>${esc(p.client)}</span>
+      </div>
+    </header>
 
-    n.style.left = clamp(x, 8, Math.max(8, W - 220)) + 'px';
-    n.style.top  = clamp(y, 4, Math.max(4, H - 150)) + 'px';
+    ${p.text ? `<div class="proj__text">${br(p.text)}</div>` : ''}
 
-    n.innerHTML =
-      `<b class="note__title">${esc(nt.title || '')}</b>
-       <div class="note__text">${esc(nt.text || '')}</div>`;
+    ${details ? `<section class="proj__block">
+        <h4>Details</h4>
+        <p class="proj__meta">${esc(details)}</p>
+      </section>` : ''}
 
-    dragify(n, desk);
-    desk.appendChild(n);
+    ${(p.images || []).length ? `<section class="proj__block">
+        <h4>Preview</h4>
+        <div class="proj__media">${p.images.map((s, i) => mediaHTML(s, i)).join('')}</div>
+      </section>` : ''}
+
+    ${credits ? `<section class="proj__block">
+        <h4>Credits</h4>
+        <dl class="proj__credits">${credits}</dl>
+      </section>` : ''}`;
+
+  const w = openWindow('p:' + p.slug, `Information about: ${p.title}`, body, {wide:true});
+  swapMedia(w, p.images, `${p.client} — ${p.title}`);
+}
+
+/* ---------------------------------------------------------
+   Info window — tabbed
+   --------------------------------------------------------- */
+
+function panelHTML(blocks){
+  return (blocks || []).map(b => {
+    if(b.type === 'checklist'){
+      return `${b.heading ? `<h4>${esc(b.heading)}</h4>` : ''}
+        <ul class="ticks${b.hollow ? ' ticks--hollow' : ''}">${
+          (b.items || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
+    }
+    return `${b.heading ? `<h4>${esc(b.heading)}</h4>` : ''}<p class="info__p">${br(b.text)}</p>`;
+  }).join('');
+}
+
+function openInfo(){
+  const tabs = DATA.info || [];
+  if(!tabs.length){
+    openWindow('info', 'About', `<p class="info__p">${br(DATA.cv || '')}</p>`);
+    return;
+  }
+
+  const body = `
+    <div class="info">
+      <nav class="info__tabs">
+        ${tabs.map((t, i) =>
+          `<button data-tab="${i}" class="${i ? '' : 'is-on'}">
+             <span>${esc(t.label)}</span><em>${esc(t.count || '')}</em></button>`).join('')}
+      </nav>
+      <div class="info__panes">
+        ${tabs.map((t, i) =>
+          `<div class="info__pane${i ? '' : ' is-on'}" data-pane="${i}">${panelHTML(t.blocks)}</div>`).join('')}
+      </div>
+    </div>`;
+
+  const w = openWindow('info', `Information about: ${DATA.name}`, body, {wide:true});
+  w.querySelectorAll('[data-tab]').forEach(b => {
+    b.addEventListener('click', () => {
+      w.querySelectorAll('[data-tab]').forEach(x => x.classList.remove('is-on'));
+      w.querySelectorAll('[data-pane]').forEach(x => x.classList.remove('is-on'));
+      b.classList.add('is-on');
+      w.querySelector(`[data-pane="${b.dataset.tab}"]`).classList.add('is-on');
+    });
   });
 }
 
@@ -348,24 +457,28 @@ function buildNotes(){
 
 function buildDock(){
   const dock = $('#dock');
+  dock.innerHTML = '';
 
   (DATA.dock || []).forEach((d, i) => {
     if(d.action === 'trash' && i > 0) dock.appendChild(el('div', 'dock__sep'));
 
     const b = el('button', 'dockitem');
-    b.style.background = d.color || '#555';
-    b.innerHTML = d.icon
-      ? `<img src="${d.icon}" alt="">`
-      : esc(d.text || d.label.slice(0,2));
+    if(d.icon){
+      b.classList.add('dockitem--img');
+      b.innerHTML = `<img src="${d.icon}" alt="">`;
+    } else {
+      b.style.background = d.color || '#6B7280';
+      b.textContent = d.text || (d.label || '').slice(0,2);
+    }
     b.appendChild(el('span', 'dockitem__tip', esc(d.label)));
     b.setAttribute('aria-label', d.label);
 
     b.addEventListener('click', () => {
-      if(d.action === 'cv')   openWindow('cv', 'About', `<p class="win__text">${esc(DATA.cv || '')}</p>`);
-      if(d.action === 'mail') location.href = 'mailto:' + DATA.email;
+      if(d.action === 'cv')    openInfo();
+      if(d.action === 'mail')  location.href = 'mailto:' + DATA.email;
       if(d.action === 'link' && d.url && d.url !== '#') open(d.url, '_blank', 'noopener');
-      if(d.action === 'trash')
-        openWindow('trash', 'Trash', `<p class="win__text">Empty. Everything worth keeping is on the desktop.</p>`);
+      if(d.action === 'trash') openWindow('trash', 'Trash',
+        `<p class="info__p">Empty. Everything worth keeping is on the desktop.</p>`);
     });
 
     dock.appendChild(b);
@@ -373,22 +486,25 @@ function buildDock(){
 }
 
 /* ---------------------------------------------------------
-   Mobile fallback — a plain list, no metaphor
+   Mobile — no metaphor, just the work
    --------------------------------------------------------- */
 
 function buildMobile(){
   const m = $('#mlist');
-  m.appendChild(el('p', 'mlist__intro', esc(DATA.cv || '')));
+
+  const first = (DATA.info || [])[0];
+  const intro = (first && first.blocks || []).find(b => b.type !== 'checklist');
+  const text  = intro ? intro.text : (DATA.cv || '');
+  if(text) m.appendChild(el('p', 'mlist__intro', br(text)));
 
   (DATA.notes || []).forEach(nt => {
     const n = el('div', 'note note--flat',
-      `<b class="note__title">${esc(nt.title||'')}</b>
-       <div class="note__text">${esc(nt.text||'')}</div>`);
+      `<b class="note__title">${esc(nt.title)}</b><div class="note__text">${br(nt.text)}</div>`);
     n.style.background = nt.color || '#FCF07A';
     m.appendChild(n);
   });
 
-  DATA.projects.forEach(p => {
+  (DATA.projects || []).forEach(p => {
     const row = el('button', 'mrow',
       `<div class="ph"></div>
        <span><b>${esc(p.title)}</b><small>${esc(p.client)} · ${esc(p.year)}</small></span>`);
@@ -398,21 +514,23 @@ function buildMobile(){
       img.onload = () => row.replaceChild(img, row.firstChild);
     }
     row.addEventListener('click', () => {
-      const open = row.nextElementSibling?.classList.contains('mopen');
-      if(open){ row.nextElementSibling.remove(); return; }
-      const box = el('div', 'mopen',
-        `${p.text ? `<p class="win__text">${esc(p.text)}</p>` : ''}
-         <div class="win__media">${(p.images||[]).map(s =>
-           `<img src="${s}" alt="" onerror="this.remove()">`).join('')}</div>`);
-      box.style.padding = '4px 0 16px';
+      const next = row.nextElementSibling;
+      if(next && next.classList.contains('mopen')){ next.remove(); row.classList.remove('is-open'); return; }
+      row.classList.add('is-open');
+      const box = el('div', 'mopen', `
+        ${p.text ? `<p class="proj__text">${br(p.text)}</p>` : ''}
+        <div class="proj__media">${(p.images || []).map((s, i) => mediaHTML(s, i)).join('')}</div>
+        ${(p.credits || []).length ? `<dl class="proj__credits">${
+          p.credits.map(c => `<div class="credit"><dt>${esc(c.role)}</dt><dd>${br(c.names)}</dd></div>`).join('')
+        }</dl>` : ''}`);
       row.after(box);
+      swapMedia(box, p.images, p.title);
     });
     m.appendChild(row);
   });
 
-  const links = el('div', 'mlinks',
-    `<a href="mailto:${DATA.email}">${DATA.email}</a>` +
+  m.appendChild(el('div', 'mlinks',
+    `<a href="mailto:${DATA.email}">${esc(DATA.email)}</a>` +
     (DATA.dock || []).filter(d => d.action === 'link' && d.url && d.url !== '#')
-      .map(d => `<a href="${d.url}" target="_blank" rel="noopener">${esc(d.label)}</a>`).join(''));
-  m.appendChild(links);
+      .map(d => `<a href="${d.url}" target="_blank" rel="noopener">${esc(d.label)}</a>`).join('')));
 }
