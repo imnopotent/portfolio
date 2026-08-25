@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: imnopotent/portfolio
+  repo: USERNAME/REPO          # <-- change to your GitHub username/repo
   branch: main
 
 media_folder: "assets/work"
@@ -70,6 +70,37 @@ collections:
               - { name: x, label: Position across (%), widget: number, required: false, value_type: float }
               - { name: y, label: Position down (%), widget: number, required: false, value_type: float }
 
+          - name: info
+            label: Info window (CV)
+            label_singular: Tab
+            widget: list
+            collapsed: true
+            summary: "{{fields.label}}"
+            required: false
+            hint: The tabs shown when someone opens the CV icon.
+            fields:
+              - { name: label, label: Tab name, widget: string }
+              - { name: count, label: Small number beside it, widget: string, required: false }
+              - name: blocks
+                label: Sections
+                label_singular: Section
+                widget: list
+                collapsed: true
+                summary: "{{fields.heading}}"
+                fields:
+                  - { name: heading, label: Heading, widget: string, required: false }
+                  - name: type
+                    label: Kind
+                    widget: select
+                    options: [text, checklist]
+                  - { name: text, label: Paragraph, widget: text, required: false }
+                  - { name: hollow, label: Hollow ticks, widget: boolean, required: false, default: false }
+                  - name: items
+                    label: List items
+                    widget: list
+                    required: false
+                    field: { name: item, label: Item, widget: string }
+
           - name: projects
             label: Projects
             label_singular: Project
@@ -107,6 +138,19 @@ collections:
                 label: Description
                 widget: text
                 required: false
+
+              - { name: type, label: Type line, widget: string, required: false, hint: "e.g. Graphic Design › Art Direction › Packaging" }
+
+              - name: credits
+                label: Credits
+                label_singular: Credit
+                widget: list
+                collapsed: true
+                required: false
+                summary: "{{fields.role}}"
+                fields:
+                  - { name: role, label: Role, widget: string }
+                  - { name: names, label: Who, widget: text }
 
               - name: x
                 label: Icon position — across (%)
