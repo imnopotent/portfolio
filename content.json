@@ -1,216 +1,125 @@
 {
   "name": "Ilyass Benfssahi",
-  "role": "Graphic designer & art director",
-  "wallpaper": "/assets/wallpaper.jpg",
+  "role": "Creative, problem solver, marketer",
   "email": "benfssahi.ilyass@gmail.com",
-  "cv": "I'm a graphic designer and art director based in Casablanca. I work at an agency on campaigns, key visuals, branding and packaging for banks, airlines and cultural institutions.\n\nAlongside that I'm building my own practice — identities, marks, emblems, packaging, objects and experiments. Everything here is the same hand.",
-  "dock": [
+  "timezone": "Africa/Casablanca",
+  "sky": "#C9D6E4",
+  "streetLength": 8200,
+  "scene": {
+    "sky": "",
+    "far": "",
+    "mid": "",
+    "near": ""
+  },
+  "intro": {
+    "line1": "Ilyass Benfssahi",
+    "line2": "Graphic design, art & creative direction",
+    "hint": "Scroll to walk"
+  },
+  "signs": [
     {
-      "label": "Illustrator",
-      "kind": "tile",
-      "text": "Ai",
-      "color": "#FF9A00",
-      "action": "none"
+      "x": 1000,
+      "y": 42,
+      "title": "What I do",
+      "text": "Graphic design, art and creative direction. I solve problems that happen to look good."
     },
     {
-      "label": "Photoshop",
-      "kind": "tile",
-      "text": "Ps",
-      "color": "#31A8FF",
-      "action": "none"
+      "x": 4200,
+      "y": 46,
+      "title": "Branding",
+      "text": "Logos, titles, idents. Brand books. Fonts. Merch. Event materials."
     },
     {
-      "label": "After Effects",
-      "kind": "tile",
-      "text": "Ae",
-      "color": "#9999FF",
-      "action": "none"
+      "x": 6900,
+      "y": 46,
+      "title": "Also",
+      "text": "Packaging, advertising, web design — and art on the side."
+    }
+  ],
+  "services": [
+    {
+      "heading": "Branding",
+      "items": [
+        "Logos, titles, idents",
+        "Brand books",
+        "Fonts",
+        "Merch",
+        "Event materials"
+      ]
     },
     {
-      "label": "CV",
-      "kind": "tile",
-      "text": "CV",
-      "color": "#F5E663",
-      "action": "cv"
+      "heading": "Packaging",
+      "items": [
+        "Labels",
+        "Boxes"
+      ]
     },
+    {
+      "heading": "Advertising",
+      "items": [
+        "Campaigns",
+        "Key visuals",
+        "Posters",
+        "Billboards",
+        "Print",
+        "Social media content",
+        "Covers — album, book, video game",
+        "Video boards"
+      ]
+    },
+    {
+      "heading": "Web design",
+      "items": [
+        "Sites and interfaces"
+      ]
+    },
+    {
+      "heading": "On the side",
+      "items": [
+        "Art"
+      ]
+    }
+  ],
+  "links": [
     {
       "label": "Instagram",
-      "kind": "tile",
-      "text": "IG",
-      "color": "#E1306C",
-      "action": "link",
       "url": "#"
     },
     {
       "label": "Behance",
-      "kind": "tile",
-      "text": "Be",
-      "color": "#1769FF",
-      "action": "link",
       "url": "#"
     },
     {
-      "label": "Mail",
-      "kind": "tile",
-      "text": "@",
-      "color": "#3B82F6",
-      "action": "mail"
-    },
-    {
-      "label": "Trash",
-      "kind": "tile",
-      "text": "🗑",
-      "color": "#8A8F98",
-      "action": "trash"
+      "label": "Email",
+      "url": "mailto:benfssahi.ilyass@gmail.com"
     }
   ],
   "projects": [
-    {
-      "slug": "newonce",
-      "title": "Newonce",
-      "client": "Bank of Africa",
-      "year": "2024",
-      "field": "Campaign",
-      "thumb": "/assets/work/newonce.jpg",
-      "images": [
-        "/assets/work/newonce.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2024",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
     {
       "slug": "loto",
       "title": "Loto",
       "client": "Loterie Nationale",
       "year": "2024",
       "field": "Campaign",
+      "surface": "billboard",
+      "label": "Billboard",
+      "x": 600,
+      "y": 6,
+      "w": 30,
+      "h": 16,
       "thumb": "/assets/work/loto.jpg",
       "images": [
         "/assets/work/loto.jpg"
       ],
       "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2024",
+      "type": "",
       "credits": [
         {
           "role": "Design",
           "names": "Ilyass Benfssahi"
         }
-      ]
-    },
-    {
-      "slug": "enigma",
-      "title": "Enigma",
-      "client": "Loterie Nationale",
-      "year": "2024",
-      "field": "Campaign",
-      "thumb": "/assets/work/enigma.jpg",
-      "images": [
-        "/assets/work/enigma.jpg"
       ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2024",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "diamonda",
-      "title": "Diamonda",
-      "client": "Loterie Nationale",
-      "year": "2023",
-      "field": "Campaign",
-      "thumb": "/assets/work/diamonda.jpg",
-      "images": [
-        "/assets/work/diamonda.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2023",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "golf",
-      "title": "Trophée Hassan II",
-      "client": "Bank of Africa",
-      "year": "2024",
-      "field": "Poster",
-      "thumb": "/assets/work/golf.jpg",
-      "images": [
-        "/assets/work/golf.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Poster › 2024",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "miff23",
-      "title": "MIFF 23",
-      "client": "Marrakech Film Festival",
-      "year": "2024",
-      "field": "Poster",
-      "thumb": "/assets/work/miff23.jpg",
-      "images": [
-        "/assets/work/miff23.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Poster › 2024",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "miff21",
-      "title": "MIFF 21",
-      "client": "Marrakech Film Festival",
-      "year": "2022",
-      "field": "Poster",
-      "thumb": "/assets/work/miff21.jpg",
-      "images": [
-        "/assets/work/miff21.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Poster › 2022",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
+      "hidden": false
     },
     {
       "slug": "comedy",
@@ -218,20 +127,51 @@
       "client": "Marrakech Comedy",
       "year": "2024",
       "field": "Poster",
+      "surface": "poster",
+      "label": "Pasted posters",
+      "x": 1250,
+      "y": 30,
+      "w": 12,
+      "h": 18,
       "thumb": "/assets/work/comedy.jpg",
       "images": [
         "/assets/work/comedy.jpg"
       ],
       "text": "",
-      "x": null,
-      "y": null,
-      "type": "Poster › 2024",
+      "type": "",
       "credits": [
         {
           "role": "Design",
           "names": "Ilyass Benfssahi"
         }
-      ]
+      ],
+      "hidden": false
+    },
+    {
+      "slug": "miff23",
+      "title": "MIFF 23",
+      "client": "Marrakech Film Festival",
+      "year": "2024",
+      "field": "Poster",
+      "surface": "poster",
+      "label": "Pasted posters",
+      "x": 1420,
+      "y": 28,
+      "w": 12,
+      "h": 18,
+      "thumb": "/assets/work/miff23.jpg",
+      "images": [
+        "/assets/work/miff23.jpg"
+      ],
+      "text": "",
+      "type": "",
+      "credits": [
+        {
+          "role": "Design",
+          "names": "Ilyass Benfssahi"
+        }
+      ],
+      "hidden": false
     },
     {
       "slug": "losangeles",
@@ -239,230 +179,77 @@
       "client": "Royal Air Maroc",
       "year": "2024",
       "field": "Campaign",
+      "surface": "shelter",
+      "label": "Bus shelter",
+      "x": 1900,
+      "y": 40,
+      "w": 15,
+      "h": 22,
       "thumb": "/assets/work/losangeles.jpg",
       "images": [
         "/assets/work/losangeles.jpg"
       ],
       "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2024",
+      "type": "",
       "credits": [
         {
           "role": "Design",
           "names": "Ilyass Benfssahi"
         }
-      ]
-    },
-    {
-      "slug": "masa",
-      "title": "MASA Abidjan",
-      "client": "Royal Air Maroc",
-      "year": "2023",
-      "field": "Campaign",
-      "thumb": "/assets/work/masa.jpg",
-      "images": [
-        "/assets/work/masa.jpg"
       ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2023",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "fes",
-      "title": "Fès Sacred Music",
-      "client": "Bank of Africa",
-      "year": "2023",
-      "field": "Poster",
-      "thumb": "/assets/work/fes.jpg",
-      "images": [
-        "/assets/work/fes.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Poster › 2023",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "redcarpet",
-      "title": "Red Carpet",
-      "client": "ONDA",
-      "year": "2023",
-      "field": "Campaign",
-      "thumb": "/assets/work/redcarpet.jpg",
-      "images": [
-        "/assets/work/redcarpet.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2023",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "payfly",
-      "title": "Pay & Fly",
-      "client": "BOA × RAM",
-      "year": "2024",
-      "field": "Object",
-      "thumb": "/assets/work/payfly.jpg",
-      "images": [
-        "/assets/work/payfly.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Object › 2024",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
+      "hidden": false
     },
     {
       "slug": "visa",
       "title": "Visa Youth",
       "client": "Bank of Africa",
       "year": "2024",
-      "field": "Product",
+      "field": "Branding",
+      "surface": "window",
+      "label": "Branch window",
+      "x": 2600,
+      "y": 26,
+      "w": 20,
+      "h": 26,
       "thumb": "/assets/work/visa.jpg",
       "images": [
         "/assets/work/visa.jpg"
       ],
       "text": "",
-      "x": null,
-      "y": null,
-      "type": "Product › 2024",
+      "type": "",
       "credits": [
         {
           "role": "Design",
           "names": "Ilyass Benfssahi"
         }
-      ]
+      ],
+      "hidden": false
     },
     {
-      "slug": "nexus",
-      "title": "Nexus Bridge",
-      "client": "Nexus Bridge Capital",
+      "slug": "payfly",
+      "title": "Pay & Fly",
+      "client": "BOA × RAM",
       "year": "2024",
-      "field": "Identity",
-      "thumb": "/assets/work/nexus.jpg",
+      "field": "Packaging",
+      "surface": "vitrine",
+      "label": "Shop vitrine",
+      "x": 3350,
+      "y": 34,
+      "w": 16,
+      "h": 22,
+      "thumb": "/assets/work/payfly.jpg",
       "images": [
-        "/assets/work/nexus.jpg"
+        "/assets/work/payfly.jpg"
       ],
       "text": "",
-      "x": null,
-      "y": null,
-      "type": "Identity › 2024",
+      "type": "",
       "credits": [
         {
           "role": "Design",
           "names": "Ilyass Benfssahi"
         }
-      ]
-    },
-    {
-      "slug": "leila",
-      "title": "Leila Mezian",
-      "client": "Musée des Arts",
-      "year": "2024",
-      "field": "Identity",
-      "thumb": "/assets/work/leila.jpg",
-      "images": [
-        "/assets/work/leila.jpg"
       ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Identity › 2024",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "hcp",
-      "title": "Recensement 2024",
-      "client": "HCP",
-      "year": "2024",
-      "field": "Identity",
-      "thumb": "/assets/work/hcp.jpg",
-      "images": [
-        "/assets/work/hcp.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Identity › 2024",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "sky1",
-      "title": "Sky1",
-      "client": "Sky1",
-      "year": "2023",
-      "field": "Identity",
-      "thumb": "/assets/work/sky1.jpg",
-      "images": [
-        "/assets/work/sky1.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Identity › 2023",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "tilila",
-      "title": "Trophées Tilila",
-      "client": "Fondation Tilila",
-      "year": "2023",
-      "field": "Identity",
-      "thumb": "/assets/work/tilila.jpg",
-      "images": [
-        "/assets/work/tilila.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Identity › 2023",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
+      "hidden": false
     },
     {
       "slug": "sahari",
@@ -470,329 +257,155 @@
       "client": "Domaine Sahari",
       "year": "2023",
       "field": "Packaging",
+      "surface": "shelf",
+      "label": "Shelf display",
+      "x": 3900,
+      "y": 44,
+      "w": 9,
+      "h": 16,
       "thumb": "/assets/work/sahari.jpg",
       "images": [
         "/assets/work/sahari.jpg"
       ],
       "text": "",
-      "x": null,
-      "y": null,
-      "type": "Packaging › 2023",
+      "type": "",
       "credits": [
         {
           "role": "Design",
           "names": "Ilyass Benfssahi"
         }
-      ]
-    },
-    {
-      "slug": "salafinv",
-      "title": "Travel Loans",
-      "client": "Salafin",
-      "year": "2023",
-      "field": "Campaign",
-      "thumb": "/assets/work/salafinv.jpg",
-      "images": [
-        "/assets/work/salafinv.jpg"
       ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2023",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
+      "hidden": false
     },
     {
-      "slug": "salafina",
-      "title": "Auto Loans",
-      "client": "Salafin",
-      "year": "2023",
-      "field": "Campaign",
-      "thumb": "/assets/work/salafina.jpg",
-      "images": [
-        "/assets/work/salafina.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2023",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "aml",
-      "title": "Crossing",
-      "client": "Africa Morocco Link",
-      "year": "2023",
-      "field": "Campaign",
-      "thumb": "/assets/work/aml.jpg",
-      "images": [
-        "/assets/work/aml.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2023",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "tombola",
-      "title": "Grande Tombola",
-      "client": "RMA",
-      "year": "2023",
-      "field": "Campaign",
-      "thumb": "/assets/work/tombola.jpg",
-      "images": [
-        "/assets/work/tombola.jpg"
-      ],
-      "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2023",
-      "credits": [
-        {
-          "role": "Design",
-          "names": "Ilyass Benfssahi"
-        }
-      ]
-    },
-    {
-      "slug": "boaonline",
-      "title": "Account Online",
+      "slug": "golf",
+      "title": "Trophée Hassan II",
       "client": "Bank of Africa",
       "year": "2024",
-      "field": "Campaign",
-      "thumb": "/assets/work/boaonline.jpg",
+      "field": "Advertising",
+      "surface": "billboard",
+      "label": "Billboard",
+      "x": 4550,
+      "y": 8,
+      "w": 28,
+      "h": 15,
+      "thumb": "/assets/work/golf.jpg",
       "images": [
-        "/assets/work/boaonline.jpg"
+        "/assets/work/golf.jpg"
       ],
       "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2024",
+      "type": "",
       "credits": [
         {
           "role": "Design",
           "names": "Ilyass Benfssahi"
         }
-      ]
+      ],
+      "hidden": false
     },
     {
-      "slug": "mastercard",
-      "title": "1 Projet 1 Minute",
-      "client": "BOA × Mastercard",
-      "year": "2023",
+      "slug": "enigma",
+      "title": "Enigma",
+      "client": "Loterie Nationale",
+      "year": "2024",
       "field": "Campaign",
-      "thumb": "/assets/work/mastercard.jpg",
+      "surface": "kiosk",
+      "label": "Kiosk",
+      "x": 5250,
+      "y": 38,
+      "w": 14,
+      "h": 20,
+      "thumb": "/assets/work/enigma.jpg",
       "images": [
-        "/assets/work/mastercard.jpg"
+        "/assets/work/enigma.jpg"
       ],
       "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2023",
+      "type": "",
       "credits": [
         {
           "role": "Design",
           "names": "Ilyass Benfssahi"
         }
-      ]
+      ],
+      "hidden": false
     },
     {
-      "slug": "values",
-      "title": "Values",
-      "client": "Bank of Africa",
+      "slug": "tilila",
+      "title": "Trophées Tilila",
+      "client": "Fondation Tilila",
       "year": "2023",
-      "field": "Campaign",
-      "thumb": "/assets/work/values.jpg",
+      "field": "Branding",
+      "surface": "flyer",
+      "label": "Flyer on the ground",
+      "x": 5800,
+      "y": 74,
+      "w": 8,
+      "h": 11,
+      "thumb": "/assets/work/tilila.jpg",
       "images": [
-        "/assets/work/values.jpg"
+        "/assets/work/tilila.jpg"
       ],
       "text": "",
-      "x": null,
-      "y": null,
-      "type": "Campaign › 2023",
+      "type": "",
       "credits": [
         {
           "role": "Design",
           "names": "Ilyass Benfssahi"
         }
-      ]
+      ],
+      "hidden": false
     },
     {
-      "slug": "ami",
-      "title": "AMI",
-      "client": "AMI",
-      "year": "2023",
-      "field": "Poster",
-      "thumb": "/assets/work/ami.jpg",
+      "slug": "nexus",
+      "title": "Nexus Bridge",
+      "client": "Nexus Bridge Capital",
+      "year": "2024",
+      "field": "Branding",
+      "surface": "gallery",
+      "label": "Gallery window",
+      "x": 6400,
+      "y": 30,
+      "w": 18,
+      "h": 24,
+      "thumb": "/assets/work/nexus.jpg",
       "images": [
-        "/assets/work/ami.jpg"
+        "/assets/work/nexus.jpg"
       ],
       "text": "",
-      "x": null,
-      "y": null,
-      "type": "Poster › 2023",
+      "type": "",
       "credits": [
         {
           "role": "Design",
           "names": "Ilyass Benfssahi"
         }
-      ]
+      ],
+      "hidden": false
     },
     {
       "slug": "studies",
-      "title": "Studies",
+      "title": "Art & experiments",
       "client": "Self-initiated",
       "year": "2022—",
-      "field": "Experiment",
+      "field": "Art",
+      "surface": "screen",
+      "label": "Video board",
+      "x": 7150,
+      "y": 12,
+      "w": 22,
+      "h": 14,
       "thumb": "/assets/work/studies.jpg",
       "images": [
         "/assets/work/studies.jpg"
       ],
       "text": "",
-      "x": null,
-      "y": null,
-      "type": "Experiment › 2022—",
+      "type": "",
       "credits": [
         {
           "role": "Design",
           "names": "Ilyass Benfssahi"
         }
-      ]
-    }
-  ],
-  "notes": [
-    {
-      "title": "What I do",
-      "text": "Campaigns, key visuals, identities, posters and packaging — mostly for banks, airlines and cultural institutions.",
-      "color": "#FCF07A",
-      "x": null,
-      "y": null
-    },
-    {
-      "title": "What I like doing",
-      "text": "Marks, emblems, seals, badges. Anything small that has to carry a lot.",
-      "color": "#BFE8FF",
-      "x": null,
-      "y": null
-    },
-    {
-      "title": "What I'm learning",
-      "text": "3D. Not to become a 3D artist — to make objects I can already see and can't yet build.",
-      "color": "#FFD3E2",
-      "x": null,
-      "y": null
-    },
-    {
-      "title": "What I want next",
-      "text": "Medals, trophies, objects. Work that ends up in someone's hand instead of on a wall.",
-      "color": "#D6F5C8",
-      "x": null,
-      "y": null
-    }
-  ],
-  "info": [
-    {
-      "label": "About me",
-      "count": "",
-      "blocks": [
-        {
-          "type": "text",
-          "heading": "",
-          "text": "Graphic designer and art director based in Casablanca. I work at an agency on campaigns, key visuals, branding and packaging for banks, airlines and cultural institutions.\n\nAlongside that I'm building my own practice — identities, marks, emblems, packaging, objects and experiments. Everything here is the same hand."
-        },
-        {
-          "type": "checklist",
-          "heading": "I can do...",
-          "hollow": false,
-          "items": [
-            "Art direction",
-            "Campaign concept",
-            "Key visual design",
-            "Brand identity",
-            "Logos, monograms, emblems",
-            "Packaging and product graphics",
-            "Posters",
-            "Print and editorial",
-            "Social and digital assets",
-            "Arabic and Latin typography"
-          ]
-        }
-      ]
-    },
-    {
-      "label": "CV",
-      "count": "",
-      "blocks": [
-        {
-          "type": "checklist",
-          "heading": "Experience",
-          "hollow": false,
-          "items": [
-            "Agency — Art Director, Graphic Designer",
-            "Freelance — identities, packaging, posters"
-          ]
-        },
-        {
-          "type": "checklist",
-          "heading": "Worked with",
-          "hollow": true,
-          "items": [
-            "Bank of Africa",
-            "Royal Air Maroc",
-            "Loterie Nationale",
-            "Salafin",
-            "RMA",
-            "Mastercard",
-            "ONDA",
-            "Haut-Commissariat au Plan",
-            "Africa Morocco Link",
-            "Marrakech International Film Festival",
-            "Nexus Bridge Capital",
-            "Domaine Sahari"
-          ]
-        },
-        {
-          "type": "checklist",
-          "heading": "Education",
-          "hollow": false,
-          "items": [
-            "Graphic design"
-          ]
-        }
-      ]
-    },
-    {
-      "label": "Interests",
-      "count": "∞",
-      "blocks": [
-        {
-          "type": "checklist",
-          "heading": "",
-          "hollow": true,
-          "items": [
-            "Emblems, seals, badges, insignia",
-            "Medals, trophies, awards",
-            "Objects you can hold",
-            "3D — currently learning",
-            "Experiments without a brief"
-          ]
-        }
-      ]
+      ],
+      "hidden": false
     }
   ]
 }
