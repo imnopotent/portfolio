@@ -21,55 +21,10 @@ collections:
           - { name: name, label: Your name, widget: string }
           - { name: role, label: Role, widget: string }
           - { name: email, label: Email, widget: string }
-          - { name: sky, label: Sky colour, widget: color, required: false }
-          - name: streetLength
-            label: Street length (px)
-            widget: number
-            value_type: int
-            hint: How far the street runs. Roughly 650px per project.
-
-          - name: intro
-            label: Opening text
-            widget: object
-            fields:
-              - { name: line1, label: Big line, widget: string }
-              - { name: line2, label: Under it, widget: string }
-              - { name: hint,  label: Scroll hint, widget: string }
-
-          - name: scene
-            label: Street artwork
-            widget: object
-            hint: Optional. Leave empty and the street is drawn in code.
-            fields:
-              - { name: far,  label: Far layer (skyline), widget: image, required: false }
-              - { name: mid,  label: Middle layer (buildings), widget: image, required: false }
-              - { name: near, label: Near layer (shopfronts), widget: image, required: false }
-
-          - name: signs
-            label: Wall signs
-            label_singular: Sign
-            widget: list
-            collapsed: true
-            summary: "{{fields.title}}"
-            required: false
-            fields:
-              - { name: title, label: Heading, widget: string }
-              - { name: text,  label: Text, widget: text }
-              - { name: x, label: Position along street (px), widget: number, value_type: int }
-              - { name: y, label: Height (% from top), widget: number, value_type: int }
-
-          - name: services
-            label: What I do
-            label_singular: Group
-            widget: list
-            collapsed: true
-            summary: "{{fields.heading}}"
-            fields:
-              - { name: heading, label: Heading, widget: string }
-              - name: items
-                label: Items
-                widget: list
-                field: { name: item, label: Item, widget: string }
+          - name: about
+            label: About text
+            widget: text
+            hint: First paragraph shows on the front page. The rest appears under About.
 
           - name: links
             label: Links
@@ -79,47 +34,42 @@ collections:
             summary: "{{fields.label}}"
             fields:
               - { name: label, label: Name, widget: string }
-              - { name: url,   label: URL, widget: string }
+              - { name: url, label: URL, widget: string }
+
+          - name: categories
+            label: Categories
+            label_singular: Category
+            widget: list
+            collapsed: true
+            summary: "{{fields.label}}"
+            hint: These are the panels. Drag to reorder them left to right.
+            fields:
+              - { name: hidden, label: Hide this category, widget: boolean, required: false, default: false }
+              - { name: label, label: Name, widget: string }
+              - { name: key, label: ID, widget: string, hint: "Lowercase, no spaces. Projects point at this." }
+              - { name: blurb, label: One line about it, widget: text }
+              - { name: color, label: Panel colour, widget: color }
 
           - name: projects
-            label: Projects
+            label: Work
             label_singular: Project
             widget: list
             collapsed: true
-            summary: "{{fields.title}} — {{fields.client}}"
-            hint: Each project sits on a surface somewhere along the street.
+            summary: "{{fields.title}} — {{fields.category}}"
             fields:
               - { name: hidden, label: Hide this project, widget: boolean, required: false, default: false }
-              - { name: title,  label: Title, widget: string }
-              - { name: slug,   label: ID, widget: string, hint: "Lowercase, no spaces, unique." }
-              - { name: client, label: Client, widget: string, required: false }
-              - { name: year,   label: Year, widget: string, required: false }
-              - name: field
-                label: Kind of work
-                widget: select
-                required: false
-                options: [Branding, Packaging, Advertising, Campaign, Poster, Web, Art]
-
-              - name: surface
-                label: Where it appears
-                widget: select
-                options: [billboard, poster, shelter, window, vitrine, shelf, kiosk, flyer, gallery, screen]
-                hint: Billboards sit high, flyers on the pavement, shelves in shops.
-              - { name: label, label: Surface caption, widget: string, required: false }
-
-              - { name: x, label: Position along street (px), widget: number, value_type: int }
-              - { name: y, label: Height (% from top), widget: number, value_type: int }
-              - { name: w, label: Width (% of screen height), widget: number, value_type: int }
-              - { name: h, label: Height (% of screen height), widget: number, value_type: int }
-
-              - { name: thumb, label: Image on the street, widget: image, required: false }
+              - { name: title, label: Title, widget: string }
+              - { name: slug, label: ID, widget: string, hint: "Lowercase, no spaces, unique." }
+              - { name: client, label: Client or kind of work, widget: string, required: false }
+              - { name: year, label: Year, widget: string, required: false }
+              - { name: category, label: Category ID, widget: string, hint: "Must match a category ID above: branding, packaging, advertising, web, art" }
+              - { name: thumb, label: Thumbnail, widget: image, required: false }
               - name: images
-                label: Images in the project page
+                label: Images
                 widget: list
                 required: false
                 field: { name: image, label: Image, widget: image }
               - { name: text, label: Description, widget: text, required: false }
-
               - name: credits
                 label: Credits
                 label_singular: Credit
@@ -128,5 +78,5 @@ collections:
                 required: false
                 summary: "{{fields.role}}"
                 fields:
-                  - { name: role,  label: Role, widget: string }
+                  - { name: role, label: Role, widget: string }
                   - { name: names, label: Who, widget: text }
