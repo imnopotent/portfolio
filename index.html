@@ -14,45 +14,33 @@
 </head>
 <body>
 
-<div class="sky" id="sky"></div>
-
-<header class="top">
-  <span class="top__name" id="tName"></span>
-  <span class="top__role" id="tRole"></span>
-  <span class="top__grow"></span>
-  <button class="top__index" id="tIndex">Index</button>
+<header class="mast">
+  <button class="mast__name" id="mHome"></button>
+  <span class="mast__role" id="mRole"></span>
+  <span class="mast__grow"></span>
+  <button class="mast__about" id="mAbout">About</button>
 </header>
 
-<!-- the street: one long horizontal strip -->
-<main class="street" id="street" aria-label="Street">
-  <div class="layer layer--far"  id="lFar"></div>
-  <div class="layer layer--mid"  id="lMid"></div>
-  <div class="layer layer--near" id="lNear"></div>
-  <div class="ground" id="ground"></div>
-  <div class="stage" id="stage"></div>
-</main>
+<main class="panels" id="panels" aria-label="Categories"></main>
 
-<div class="intro" id="intro">
-  <b id="iLine1"></b>
-  <span id="iLine2"></span>
-  <em id="iHint"></em>
+<div class="hero" id="hero">
+  <h1 id="hName"></h1>
+  <p id="hAbout"></p>
+  <span class="hero__hint">Pick a category</span>
 </div>
 
-<div class="progress"><i id="progressBar"></i></div>
-
-<!-- index overlay -->
-<div class="index" id="index" aria-hidden="true">
-  <button class="index__close" id="indexClose" aria-label="Close"></button>
-  <div class="index__inner">
-    <div class="index__services" id="idxServices"></div>
-    <ol class="index__list" id="idxList"></ol>
-    <div class="index__links" id="idxLinks"></div>
+<div class="about" id="aboutPanel" aria-hidden="true">
+  <button class="x" id="aboutClose" aria-label="Close"></button>
+  <div class="about__inner">
+    <h2 id="aName"></h2>
+    <div class="about__text" id="aText"></div>
+    <div class="about__services" id="aServices"></div>
+    <div class="about__links" id="aLinks"></div>
   </div>
 </div>
 
-<!-- project sheet -->
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-hidden="true">
-  <button class="sheet__close" id="sheetClose" aria-label="Close"></button>
+  <button class="x" id="sheetClose" aria-label="Close"></button>
   <div class="sheet__scroll" id="sheetScroll"></div>
 </div>
 

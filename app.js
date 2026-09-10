@@ -1,215 +1,131 @@
 /* =========================================================
-   The street — behaviour
+   Categories as panels — behaviour
    ========================================================= */
 
 let DATA = null;
-let LEN  = 8200;
+let OPEN = null;
 
 const $  = s => document.querySelector(s);
 const el = (t, c, h) => { const n = document.createElement(t); if(c) n.className = c; if(h != null) n.innerHTML = h; return n; };
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const visible = l => (l || []).filter(x => !x.hidden);
 
-const MOBILE_AT = 820;
-const isMobile = () => innerWidth < MOBILE_AT || matchMedia('(pointer:coarse)').matches;
-
 fetch('content.json').then(r => r.json()).then(d => { DATA = d; start(); })
-  .catch(() => { document.body.innerHTML = '<p style="font:14px system-ui;padding:40px">content.json could not be loaded.</p>'; });
-
-/* ---------------------------------------------------------
-   Boot
-   --------------------------------------------------------- */
+  .catch(() => { document.body.innerHTML = '<p style="font:14px system-ui;padding:40px;color:#fff">content.json could not be loaded.</p>'; });
 
 function start(){
-  LEN = DATA.streetLength || 8200;
-
-  $('#tName').textContent = DATA.name || '';
-  $('#tRole').textContent = DATA.role || '';
-  $('#iLine1').textContent = DATA.intro?.line1 || DATA.name || '';
-  $('#iLine2').textContent = DATA.intro?.line2 || DATA.role || '';
-  $('#iHint').textContent  = DATA.intro?.hint  || 'Scroll to walk';
   document.title = DATA.name || 'Portfolio';
+  $('#mHome').textContent = DATA.name || '';
+  $('#mRole').textContent = DATA.role || '';
+  $('#hName').textContent = DATA.name || '';
+  $('#hAbout').textContent = firstPara(DATA.about);
+  $('#aName').textContent = DATA.name || '';
+  $('#aText').textContent = DATA.about || '';
 
-  if(DATA.sky) document.documentElement.style.setProperty('--sky', DATA.sky);
+  $('#aServices').innerHTML = visible(DATA.categories).map(c =>
+    `<div><h3>${esc(c.label)}</h3><p>${esc(c.blurb)}</p></div>`).join('');
 
-  buildIndex();
-  wireChrome();
-  layout();
-
-  let t;
-  addEventListener('resize', () => { clearTimeout(t); t = setTimeout(layout, 140); }, {passive:true});
-}
-
-let mode = null;
-
-function layout(){
-  const want = isMobile() ? 'mobile' : 'street';
-  document.body.dataset.mode = want;
-  if(want === 'mobile'){ mode = want; return; }
-
-  mode = want;
-  buildStreet();
-  applyScene();
-  onScroll();
-}
-
-/* ---------------------------------------------------------
-   Scene art — falls back to drawn CSS when none supplied
-   --------------------------------------------------------- */
-
-function applyScene(){
-  const s = DATA.scene || {};
-  const set = (id, url, drawn) => {
-    const n = $(id);
-    if(url){ n.style.backgroundImage = `url("${url}")`; n.classList.remove('is-drawn'); }
-    else   { n.style.backgroundImage = ''; n.classList.toggle('is-drawn', drawn); }
-  };
-  set('#lFar',  s.far,  true);
-  set('#lMid',  s.mid,  true);
-  set('#lNear', s.near, false);
-}
-
-/* ---------------------------------------------------------
-   Build the street
-   --------------------------------------------------------- */
-
-function buildStreet(){
-  const stage = $('#stage');
-  const street = $('#street');
-  stage.innerHTML = '';
-
-  /* the strip is as long as the content says, scaled to viewport height */
-  const H = innerHeight;
-  const W = Math.max(LEN, innerWidth + 400);
-  stage.style.width = W + 'px';
-  $('#lFar').style.width  = W + 'px';
-  $('#lMid').style.width  = W + 'px';
-  $('#lNear').style.width = W + 'px';
-  $('#ground').style.width = W + 'px';
-  street.style.setProperty('--len', W + 'px');
-
-  /* a spacer keeps the scroll container the right length */
-  const spacer = el('div');
-  spacer.style.cssText = `position:absolute;left:0;top:0;width:${W}px;height:1px;`;
-  stage.appendChild(spacer);
-
-  visible(DATA.projects).forEach((p, i) => {
-    const slot = el('button', `slot slot--${p.surface || 'poster'}`);
-    slot.style.left = p.x + 'px';
-    slot.style.top  = (p.y / 100 * H) + 'px';
-    slot.style.width  = (p.w / 100 * H) * 1.6 + 'px';
-    slot.style.height = (p.h / 100 * H) + 'px';
-    slot.style.setProperty('--tilt', ((i % 2 ? -1 : 1) * (0.6 + (i % 3) * 0.7)) + 'deg');
-    slot.setAttribute('aria-label', `${p.title} — ${p.client}`);
-
-    slot.innerHTML =
-      `<div class="slot__art"></div>
-       <span class="slot__cap">${esc(p.title)} · ${esc(p.client)}</span>`;
-
-    if(p.thumb){
-      const img = new Image();
-      img.src = p.thumb; img.alt = '';
-      img.onload = () => slot.querySelector('.slot__art').appendChild(img);
-    }
-
-    slot.addEventListener('click', () => openSheet(p.slug));
-    stage.appendChild(slot);
-  });
-
-  (DATA.signs || []).forEach(s => {
-    const n = el('div', 'sign', `<b>${esc(s.title)}</b><p>${esc(s.text)}</p>`);
-    n.style.left = s.x + 'px';
-    n.style.top  = (s.y / 100 * H) + 'px';
-    stage.appendChild(n);
-  });
-}
-
-/* ---------------------------------------------------------
-   Walking
-   --------------------------------------------------------- */
-
-function onScroll(){
-  const street = $('#street');
-  const x = street.scrollLeft;
-  const max = street.scrollWidth - street.clientWidth;
-
-  $('#lFar').style.transform  = `translateX(${x * 0.82}px)`;
-  $('#lMid').style.transform  = `translateX(${x * 0.55}px)`;
-  $('#lNear').style.transform = `translateX(${x * 0.18}px)`;
-
-  $('#progressBar').style.width = (max ? (x / max) * 100 : 0) + '%';
-  $('#intro').classList.toggle('is-gone', x > 90);
-}
-
-function wireChrome(){
-  const street = $('#street');
-
-  street.addEventListener('scroll', onScroll, {passive:true});
-
-  /* vertical wheel walks the street */
-  street.addEventListener('wheel', e => {
-    if(Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-    e.preventDefault();
-    street.scrollLeft += e.deltaY;
-  }, {passive:false});
-
-  addEventListener('keydown', e => {
-    if($('#sheet').classList.contains('is-open') || $('#index').classList.contains('is-open')){
-      if(e.key === 'Escape'){ closeSheet(); closeIndex(); }
-      return;
-    }
-    const step = innerWidth * 0.7;
-    if(e.key === 'ArrowRight') street.scrollBy({left: step, behavior:'smooth'});
-    if(e.key === 'ArrowLeft')  street.scrollBy({left:-step, behavior:'smooth'});
-    if(e.key === 'Escape') closeIndex();
-  });
-
-  $('#tIndex').addEventListener('click', openIndex);
-  $('#indexClose').addEventListener('click', closeIndex);
-  $('#sheetClose').addEventListener('click', closeSheet);
-
-  addEventListener('popstate', () => {
-    const slug = location.hash.slice(1);
-    if(slug) openSheet(slug, true); else closeSheet(true);
-  });
-
-  if(location.hash) openSheet(location.hash.slice(1), true);
-}
-
-/* ---------------------------------------------------------
-   Index
-   --------------------------------------------------------- */
-
-function buildIndex(){
-  $('#idxServices').innerHTML = (DATA.services || []).map(s =>
-    `<div><h3>${esc(s.heading)}</h3><ul>${
-      (s.items || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul></div>`).join('');
-
-  const list = $('#idxList');
-  list.innerHTML = '';
-  visible(DATA.projects).forEach((p, i) => {
-    const li = el('li', '', `
-      <button data-slug="${esc(p.slug)}">
-        <span class="n">${String(i + 1).padStart(2,'0')}</span>
-        <span class="t">${esc(p.title)}</span>
-        <span class="c">${esc(p.client)} · ${esc(p.year)}</span>
-      </button>`);
-    li.querySelector('button').addEventListener('click', () => { closeIndex(); openSheet(p.slug); });
-    list.appendChild(li);
-  });
-
-  $('#idxLinks').innerHTML = (DATA.links || []).map(l =>
+  $('#aLinks').innerHTML = (DATA.links || []).map(l =>
     `<a href="${l.url}"${l.url.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${esc(l.label)}</a>`).join('');
+
+  buildPanels();
+  wire();
+
+  const hash = location.hash.slice(1);
+  if(hash){
+    if(DATA.projects.some(p => p.slug === hash)) openSheet(hash, true);
+    else openPanel(hash, true);
+  }
 }
 
-function openIndex(){
-  $('#index').classList.add('is-open');
-  $('#index').setAttribute('aria-hidden','false');
+function firstPara(t){
+  return String(t || '').split('\n\n')[0];
 }
-function closeIndex(){
-  $('#index').classList.remove('is-open');
-  $('#index').setAttribute('aria-hidden','true');
+
+/* ---------------------------------------------------------
+   Panels
+   --------------------------------------------------------- */
+
+function buildPanels(){
+  const wrap = $('#panels');
+  wrap.innerHTML = '';
+
+  visible(DATA.categories).forEach((c, i) => {
+    const works = visible(DATA.projects).filter(p => p.category === c.key);
+
+    const panel = el('section', 'panel');
+    panel.dataset.key = c.key;
+    panel.style.setProperty('--c', c.color || '#333');
+
+    panel.innerHTML = `
+      <span class="panel__n">${String(i + 1).padStart(2,'0')}</span>
+      <span class="panel__label">${esc(c.label)}</span>
+      <span class="panel__count">${works.length}</span>
+      <div class="work">
+        <div class="work__head">
+          <h2>${esc(c.label)}</h2>
+          <p>${esc(c.blurb)}</p>
+        </div>
+        <div class="work__grid"></div>
+      </div>`;
+
+    const grid = panel.querySelector('.work__grid');
+    works.forEach(p => {
+      const card = el('button', 'card', `
+        <span class="card__img"><span class="card__ph">${esc((p.thumb || '').split('/').pop())}</span></span>
+        <b>${esc(p.title)}</b>
+        <small>${esc(p.client)} · ${esc(p.year)}</small>`);
+      if(p.thumb){
+        const img = new Image();
+        img.src = p.thumb; img.alt = '';
+        img.onload = () => {
+          const box = card.querySelector('.card__img');
+          box.innerHTML = '';
+          box.appendChild(img);
+        };
+      }
+      card.addEventListener('click', e => { e.stopPropagation(); openSheet(p.slug); });
+      grid.appendChild(card);
+    });
+
+    panel.addEventListener('click', () => {
+      if(panel.classList.contains('is-open')) return;
+      openPanel(c.key);
+    });
+
+    wrap.appendChild(panel);
+  });
+}
+
+function openPanel(key, silent){
+  const wrap = $('#panels');
+  const panel = wrap.querySelector(`[data-key="${CSS.escape(key)}"]`);
+  if(!panel) return;
+
+  wrap.querySelectorAll('.panel').forEach(p => p.classList.remove('is-open'));
+  panel.classList.add('is-open');
+  wrap.classList.add('has-open');
+  $('#hero').classList.add('is-gone');
+  OPEN = key;
+
+  if(!silent){
+    history.pushState({key}, '', '#' + key);
+    if(matchMedia('(max-width:900px)').matches){
+      setTimeout(() => panel.scrollIntoView({behavior:'smooth', block:'start'}), 80);
+    }
+  }
+  const cat = DATA.categories.find(c => c.key === key);
+  document.title = `${cat ? cat.label : ''} — ${DATA.name}`;
+}
+
+function closePanels(silent){
+  const wrap = $('#panels');
+  wrap.querySelectorAll('.panel').forEach(p => p.classList.remove('is-open'));
+  wrap.classList.remove('has-open');
+  $('#hero').classList.remove('is-gone');
+  OPEN = null;
+  document.title = DATA.name;
+  if(!silent && location.hash) history.pushState({}, '', location.pathname);
 }
 
 /* ---------------------------------------------------------
@@ -226,9 +142,13 @@ function openSheet(slug, silent){
   const i = list.findIndex(p => p.slug === slug);
   if(i < 0) return;
   const p = list[i];
-  const next = list[(i + 1) % list.length];
 
-  const meta = [p.client, p.year, p.field, p.label].filter(Boolean)
+  /* next within the same category, so browsing stays on topic */
+  const sameCat = list.filter(x => x.category === p.category);
+  const next = sameCat[(sameCat.indexOf(p) + 1) % sameCat.length];
+  const cat = DATA.categories.find(c => c.key === p.category);
+
+  const meta = [p.client, p.year, cat ? cat.label : ''].filter(Boolean)
     .map(m => `<span>${esc(m)}</span>`).join('');
 
   $('#sheetScroll').innerHTML = `
@@ -238,13 +158,11 @@ function openSheet(slug, silent){
       <div class="sheet__meta">${meta}</div>
       ${p.text ? `<p class="sheet__text">${esc(p.text)}</p>` : ''}
       <div class="sheet__media">${(p.images || []).map((s, n) => mediaHTML(s, n)).join('')}</div>
-      ${(p.credits || []).length ? `<div class="sheet__credits">
-        <h4>Credits</h4>
-        <dl>${p.credits.map(c => `<div class="credit"><dt>${esc(c.role)}</dt><dd>${esc(c.names)}</dd></div>`).join('')}</dl>
-      </div>` : ''}
-      <button class="sheet__next" data-next="${esc(next.slug)}">
-        <small>Next</small><b>${esc(next.title)}</b>
-      </button>
+      ${(p.credits || []).length ? `<div class="sheet__credits"><h4>Credits</h4><dl>${
+        p.credits.map(c => `<div class="credit"><dt>${esc(c.role)}</dt><dd>${esc(c.names)}</dd></div>`).join('')
+      }</dl></div>` : ''}
+      ${next && next !== p ? `<button class="sheet__next" data-next="${esc(next.slug)}">
+        <small>Next in ${esc(cat ? cat.label : '')}</small><b>${esc(next.title)}</b></button>` : ''}
     </div>`;
 
   (p.images || []).forEach((src, n) => {
@@ -254,8 +172,10 @@ function openSheet(slug, silent){
     img.onload = () => { const s = $(`[data-slot="${n}"]`); if(s) s.replaceWith(img); };
   });
 
-  $('#sheetScroll').querySelector('[data-next]')
-    .addEventListener('click', e => openSheet(e.currentTarget.dataset.next));
+  const nx = $('#sheetScroll').querySelector('[data-next]');
+  if(nx) nx.addEventListener('click', e => openSheet(e.currentTarget.dataset.next));
+
+  if(!OPEN) openPanel(p.category, true);
 
   $('#sheet').classList.add('is-open');
   $('#sheet').setAttribute('aria-hidden','false');
@@ -267,6 +187,39 @@ function openSheet(slug, silent){
 function closeSheet(silent){
   $('#sheet').classList.remove('is-open');
   $('#sheet').setAttribute('aria-hidden','true');
-  document.title = DATA.name;
-  if(!silent && location.hash) history.pushState({}, '', location.pathname);
+  if(!silent && location.hash) history.pushState({}, '', OPEN ? '#' + OPEN : location.pathname);
+}
+
+/* ---------------------------------------------------------
+   Wiring
+   --------------------------------------------------------- */
+
+function wire(){
+  $('#mHome').addEventListener('click', () => { closeSheet(true); closeAbout(); closePanels(); scrollTo({top:0, behavior:'smooth'}); });
+  $('#mAbout').addEventListener('click', openAbout);
+  $('#aboutClose').addEventListener('click', closeAbout);
+  $('#sheetClose').addEventListener('click', () => closeSheet());
+
+  addEventListener('keydown', e => {
+    if(e.key !== 'Escape') return;
+    if($('#sheet').classList.contains('is-open')) return closeSheet();
+    if($('#aboutPanel').classList.contains('is-open')) return closeAbout();
+    if(OPEN) closePanels();
+  });
+
+  addEventListener('popstate', () => {
+    const h = location.hash.slice(1);
+    if(!h){ closeSheet(true); closePanels(true); return; }
+    if(DATA.projects.some(p => p.slug === h)) openSheet(h, true);
+    else { closeSheet(true); openPanel(h, true); }
+  });
+}
+
+function openAbout(){
+  $('#aboutPanel').classList.add('is-open');
+  $('#aboutPanel').setAttribute('aria-hidden','false');
+}
+function closeAbout(){
+  $('#aboutPanel').classList.remove('is-open');
+  $('#aboutPanel').setAttribute('aria-hidden','true');
 }
